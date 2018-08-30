@@ -9,8 +9,7 @@ on init
     # Skip this part
 
 on post-fs
-    # Put Performance Boosting configuration here and mount things to vendor
-    mount auto /perfboostsconfig.xml /vendor/etc/perf/perfboostsconfig.xml bind
+    # Skip this part
 
 on late-fs
     # Filesystemworks
