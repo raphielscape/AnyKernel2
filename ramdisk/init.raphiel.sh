@@ -18,6 +18,10 @@ function get-set-forall() {
     done
 }
 
+function delett {
+    rm -rf $1
+}
+
 {
 
 # devfreq tuning
@@ -35,5 +39,4 @@ get-set-forall /sys/class/devfreq/*qcom,cpubw*/bw_hwmon/guard_band_mbps 0
 get-set-forall /sys/class/devfreq/*qcom,cpubw*/bw_hwmon/up_scale 250
 get-set-forall /sys/class/devfreq/*qcom,cpubw*/bw_hwmon/idle_mbps 1600
 get-set-forall /sys/class/devfreq/*qcom,mincpubw*/governor cpufreq
-
 }&

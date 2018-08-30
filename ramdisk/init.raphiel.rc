@@ -6,7 +6,7 @@
 # DO NOT MODIFY THIS FILE
 
 on init
-    # Skip this part
+    # Skip this
 
 on post-fs
     # Skip this part

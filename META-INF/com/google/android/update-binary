@@ -118,15 +118,21 @@ if [ -f /system/system/build.prop ]; then
   unset root;
 fi;
 
+ui_print "Checking Treble or nah..."
+mount -o rw,remount -t auto /system;
+mount -o rw,remount -t auto /vendor 2>/dev/null;
 if [ "$(file_getprop /system/build.prop ro.treble.enabled)" == "true" ]; then
   ui_print "Treble bois~"
+  rm -rf /vendor/etc/perf
   dtb=/tmp/anykernel/treble;
-  rm -rf /vendor/etc/perf/perfboostsconfig.xml
 else
   ui_print="Oof, move to treble soon plz"
+  rm -rf /system/vendor/etc/perf
   dtb=/tmp/anykernel/nontreble;
-  rm -rf /system/vendor/etc/perf/perfboostsconfig.xml
 fi;
+mount -o ro,remount -t auto /system;
+mount -o ro,remount -t auto /vendor 2>/dev/null;
+
 savedpath="$LD_LIBRARY_PATH";
 savedpre="$LD_PRELOAD";
 unset LD_LIBRARY_PATH;
