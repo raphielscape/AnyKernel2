@@ -25,7 +25,7 @@ on property:persist.spectrum.profile=0 && property:init.svc.qcom-post-boot=stopp
 
     # GPU
     write /sys/class/kgsl/kgsl-3d0/devfreq/governor "msm-adreno-tz"
-    write /sys/class/kgsl/kgsl-3d0/devfreq/min_freq "133000000"
+    write /sys/class/kgsl/kgsl-3d0/devfreq/min_freq "200000000"
 	write /sys/class/kgsl/kgsl-3d0/max_gpuclk "725000000"
     write /sys/module/adreno_idler/parameters/adreno_idler_active "N"
     write /sys/class/kgsl/kgsl-3d0/devfreq/adreno_boost "1"
@@ -68,7 +68,7 @@ on property:persist.spectrum.profile=2 && property:init.svc.qcom-post-boot=stopp
 
     # GPU
     write /sys/class/kgsl/kgsl-3d0/devfreq/governor "msm-adreno-tz"
-    write /sys/class/kgsl/kgsl-3d0/devfreq/min_freq "133000000"
+    write /sys/class/kgsl/kgsl-3d0/devfreq/min_freq "200000000"
     write /sys/class/kgsl/kgsl-3d0/max_gpuclk "510000000"
     write /sys/module/adreno_idler/parameters/adreno_idler_active "Y"
     write /sys/class/kgsl/kgsl-3d0/devfreq/adreno_boost "0"

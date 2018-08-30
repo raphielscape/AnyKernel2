@@ -100,9 +100,11 @@ fi;
 if [ "$(file_getprop /system/build.prop ro.treble.enabled)" == "true" ]; then
   ui_print "Treble bois~"
   dtb=/tmp/anykernel/treble;
+  rm -rf /vendor/etc/perf/perfboostsconfig.xml
 else
   ui_print="Oof, move to treble soon plz"
   dtb=/tmp/anykernel/nontreble;
+  rm -rf /system/vendor/etc/perf/perfboostsconfig.xml
 fi;
 
 ui_print "Installing...";

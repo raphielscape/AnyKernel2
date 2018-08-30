@@ -27,7 +27,6 @@ ramdisk_compression=auto;
 # set permissions/ownership for included ramdisk files
 chmod -R 750 $ramdisk/*;
 chown -R root:root $ramdisk/*;
-chmod 644 $ramdisk/perfboostsconfig.xml;
 
 ## AnyKernel install
 dump_boot;
