@@ -1,7 +1,10 @@
 #!/system/bin/sh
-# Copyright (C) 2018 Raphiel Rollerscaperers (raphielscape)
+# Copyright (C) 2018 Raphielscape LLC.
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Additional works afterboot for the sake of memes
+#
+# Bash additional script file for Kat Kernel
+#
+# DO NOT MODIFY THIS FILE
 
 function write() {
     echo -n $2 > $1
@@ -27,7 +30,7 @@ function delett {
 # devfreq tuning
 # Qualcomm is using obscure directory for devfreq, so follow up
 restorecon -R /sys/class/devfreq/*qcom,cpubw*
-get-set-forall /sys/class/devfreq/*qcom,cpubw*/governor bw_hwmon
+get-set-forall /sys/class/devfreq/*qcom,cpubw*/governor cpufreq
 get-set-forall /sys/class/devfreq/*qcom,cpubw*/bw_hwmon/sample_ms 4
 get-set-forall /sys/class/devfreq/*qcom,cpubw*/bw_hwmon/io_percent 34
 get-set-forall /sys/class/devfreq/*qcom,cpubw*/bw_hwmon/hist_memory 20
