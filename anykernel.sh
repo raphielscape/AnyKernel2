@@ -34,7 +34,6 @@ dump_boot;
 # begin ramdisk changes
 
 # add raphielscape initialization script
-insert_line init.rc "import /init.spectrum.rc" after "import /init.trace.rc" "import /init.spectrum.rc";
 insert_line init.rc "import /init.raphiel.rc" after "import /init.spectrum.rc" "import /init.raphiel.rc";
 
 #remove conflicting scheduler tuningscape
