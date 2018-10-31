@@ -24,7 +24,7 @@ on late-fs
     write /sys/block/dm-1/queue/read_ahead_kb 2048
 
 on boot
-    # Skip this part
+   # Nothing here
 
 on property:sys.boot_completed=1
     setprop sys.use_fifo_ui 1
@@ -53,3 +53,6 @@ on property:init.svc.qcom-post-boot=stopped
     # As-per Google documentation
     # Refer to https://source.android.com/devices/tech/perf/boot-times
     write /sys/block/sda/queue/read_ahead_kb 512
+
+    # Stop VR service coz it's annoying
+    stop vendor.vr-1-0
