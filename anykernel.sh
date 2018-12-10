@@ -9,8 +9,8 @@ do.devicecheck=1
 do.modules=0
 do.cleanup=1
 do.cleanuponabort=1
-device.name1=mido
-device.name2=beryllium
+device.name1=beryllium
+device.name2=dipper
 '; } # end properties
 
 # shell variables
