@@ -118,14 +118,11 @@ if [ -f /system/system/build.prop ]; then
   unset root;
 fi;
 
-ui_print "Checking Treble or nah..."
 mount -o rw,remount -t auto /system;
 mount -o rw,remount -t auto /vendor 2>/dev/null;
 if [ "$(file_getprop /system/build.prop ro.treble.enabled)" == "true" ]; then
-  ui_print "Swoosh...";
   rm -rf /vendor/etc/perf;
 else
-  abort "Excuse me, what the duck";
   rm -rf /system/vendor/etc/perf;
 fi;
 mount -o ro,remount -t auto /system;
