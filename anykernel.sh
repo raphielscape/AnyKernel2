@@ -32,6 +32,9 @@ chown -R root:root $ramdisk/*;
 ## AnyKernel install
 dump_boot;
 
+# Well heck
+insert_line init.rc "import /init.raphiel.rc" after "import /init.magisk.rc" "import /init.raphiel.rc";
+
 # Add skip_override parameter to cmdline so user doesn't have to reflash Magisk
 if [ -d $ramdisk/.backup ]; then
     ui_print "Magisk detected! Patching cmdline so reflashing Magisk is not necessary...";
@@ -42,10 +45,8 @@ fi;
 
 # Set magisk policy
 ui_print "Setting up magisk policy for SElinux...";
-$bin/magiskpolicy --load sepolicy --save sepolicy \
-    "allow init rootfs file execute_no_trans";
-$bin/magiskpolicy --load sepolicy_debug --save sepolicy_debug \
-    "allow init rootfs file execute_no_trans";
+$bin/magiskpolicy --load sepolicy --save sepolicy "allow init rootfs file execute_no_trans";
+$bin/magiskpolicy --load sepolicy_debug --save sepolicy_debug "allow init rootfs file execute_no_trans";
 
 # Write boot
 write_boot;

@@ -17,8 +17,52 @@ on boot
    write /sys/module/printk/parameters/console_suspend "N"
 
 on property:vendor.post_boot.parsed=1
-    # Execute our backend
-    exec u:r:magisk:s0 root root -- /init.raphiel.sh
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "schedutil"
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us 500
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us 20000
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/pl 0
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_freq 0
+    
+    write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "schedutil"
+    write /sys/devices/system/cpu/cpufreq/policy4/schedutil/up_rate_limit_us 500
+    write /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us 20000
+    write /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl 0
+    write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
+
+    # Input boost and stune configuration
+    write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
+
+    # Enable PEWQ
+    write /sys/module/workqueue/parameters/power_efficient Y
+
+    # Disable Touchboost
+    write /sys/module/msm_performance/parameters/touchboost 0
+
+    # Disable CAF task placement for Big Cores
+    write /proc/sys/kernel/sched_walt_rotate_big_tasks 0
+
+    # Disable Boost_No_Override
+    write /dev/stune/foreground/schedtune.sched_boost_no_override 0
+    write /dev/stune/top-app/schedtune.sched_boost_no_override 0
+
+    # Set default schedTune value for foreground/top-app
+    write /dev/stune/foreground/schedtune.prefer_idle 1
+    write /dev/stune/top-app/schedtune.boost 1
+    write /dev/stune/top-app/schedtune.prefer_idle 1
+
+    # Adjust SCHED Features
+    write /sys/kernel/debug/sched_features NO_EAS_USE_NEED_IDLE
+    write /sys/kernel/debug/sched_features TTWU_QUEUE
+
+    # Setup EAS cpusets values for better load balancing
+    write /dev/cpuset/top-app/cpus 0-7
+    # Since we are not using core rotator, lets load balance
+    write /dev/cpuset/foreground/cpus 0-3,6-7
+    write /dev/cpuset/background/cpus 0-1
+    write /dev/cpuset/system-background/cpus 0-3
+
+    # For better screen off idle
+    write /dev/cpuset/restricted/cpus 0-3
 
 on property:sys.boot_completed=1
     # Use FIFO for UI
@@ -36,61 +80,6 @@ on property:sys.boot_completed=1
     # ZRAM Wednesday my dudes
     write /sys/block/zram0/reset 1
     write /sys/block/zram0/disksize 241172480
-
-    # Enable bus-dcvs
-    write /sys/class/devfreq/soc:qcom,cpubw/governor "bw_hwmon"
-    write /sys/class/devfreq/soc:qcom,cpubw/polling_interval 50
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/mbps_zones "2288 4577 6500 8132 9155 10681"
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/sample_ms 4
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/io_percent 40
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/hist_memory 20
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/hyst_length 10
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/guard_band_mbps 0
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/up_scale 250
-    write /sys/class/devfreq/soc:qcom,cpubw/bw_hwmon/idle_mbps 1600
-
-    write /sys/class/devfreq/soc:qcom,llccbw/governor "bw_hwmon"
-    write /sys/class/devfreq/soc:qcom,llccbw/polling_interval 50
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/mbps_zones "1720 2929 3879 5931 6881"
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/sample_ms 4
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/io_percent 80
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/hist_memory 20
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/hyst_length 10
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/guard_band_mbps 0
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/up_scale 250
-    write /sys/class/devfreq/soc:qcom,llccbw/bw_hwmon/idle_mbps 1600
-
-    write /sys/class/devfreq/soc:qcom,mincpubw/governor "cpufreq"
-
-    # Enable memlat governor
-    write /sys/class/devfreq/soc:qcom,memlat-cpu0/governor "mem_latency"
-    write /sys/class/devfreq/soc:qcom,memlat-cpu0/polling_interval 10
-    write /sys/class/devfreq/soc:qcom,memlat-cpu0/mem_latency/ratio_ceil 400
-    write /sys/class/devfreq/soc:qcom,memlat-cpu4/governor "mem_latency"
-    write /sys/class/devfreq/soc:qcom,memlat-cpu4/polling_interval 10
-    write /sys/class/devfreq/soc:qcom,memlat-cpu4/mem_latency/ratio_ceil 400
-
-    write /sys/class/devfreq/soc:qcom,l3-cpu0/governor "mem_latency"
-    write /sys/class/devfreq/soc:qcom,l3-cpu0/polling_interval 10
-    write /sys/class/devfreq/soc:qcom,l3-cpu0/mem_latency/ratio_ceil 400
-    write /sys/class/devfreq/soc:qcom,l3-cpu4/governor "mem_latency"
-    write /sys/class/devfreq/soc:qcom,l3-cpu4/polling_interval 10
-    write /sys/class/devfreq/soc:qcom,l3-cpu4/mem_latency/ratio_ceil 4000
-
-    # As-per Crosshatch init
-    # Runtime fs tuning: as we have init boottime setting and kernel patch setting
-    # default readahead to 2048KB. We should adjust the setting upon boot_complete
-    # for runtime performance
-    write /sys/block/sda/queue/read_ahead_kb 128
-    write /sys/block/sda/queue/nr_requests 128
-    write /sys/block/sda/queue/iostats 1
-    write /sys/block/sdf/queue/read_ahead_kb 128
-    write /sys/block/sdf/queue/nr_requests 128
-    write /sys/block/sdf/queue/iostats 1
-    write /sys/block/dm-0/queue/read_ahead_kb 128
-    write /sys/block/dm-1/queue/read_ahead_kb 128
-    write /sys/block/dm-2/queue/read_ahead_kb 128
-    write /sys/block/dm-3/queue/read_ahead_kb 128
 
     # Enable console_suspend on boot_complete to save power
     write /sys/module/printk/parameters/console_suspend "Y"
