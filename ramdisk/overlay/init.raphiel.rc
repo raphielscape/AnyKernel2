@@ -30,7 +30,9 @@ on property:vendor.post_boot.parsed=1
     write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
 
     # Input boost and stune configuration
-    write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
+    write /sys/module/cpu_boost/parameters/input_boost_freq "0:1056000 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+    write /sys/module/cpu_boost/parameters/input_boost_ms 600
+    write /sys/module/cpu_boost/parameters/dynamic_stune_boost 15
 
     # Enable PEWQ
     write /sys/module/workqueue/parameters/power_efficient Y
@@ -63,6 +65,9 @@ on property:vendor.post_boot.parsed=1
 
     # For better screen off idle
     write /dev/cpuset/restricted/cpus 0-3
+
+    #Enable suspend to idle mode to reduce latency during suspend/resume
+    write /sys/power/mem_sleep "s2idle"
 
 on property:sys.boot_completed=1
     # Use FIFO for UI
