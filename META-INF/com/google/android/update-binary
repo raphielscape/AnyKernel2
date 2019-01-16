@@ -133,6 +133,7 @@ if [ "$(file_getprop anykernel.sh do.devicecheck)" == 1 ]; then
   done;
   ui_print " ";
   if [ ! "$match" ]; then
+  
     abort "Unsupported device. Aborting...";
   fi;
 fi;
@@ -163,16 +164,6 @@ if [ "$supported_ver" ]; then
     abort "Unsupported Android version. Aborting...";
   fi;
 fi;
-
-mount -o rw,remount -t auto /system;
-mount -o rw,remount -t auto /vendor 2>/dev/null;
-if [ "$(file_getprop /system/build.prop ro.treble.enabled)" == "true" ]; then
-  rm -rf /vendor/etc/perf;
-else
-  rm -rf /system/vendor/etc/perf;
-fi;
-mount -o ro,remount -t auto /system;
-mount -o ro,remount -t auto /vendor 2>/dev/null;
 
 ui_print "Installing...";
 for i in $($bb --list); do
