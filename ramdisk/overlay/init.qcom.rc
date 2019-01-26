@@ -16,7 +16,7 @@ on boot
    # Disable console_suspend to get better logging for kernel crashes
    write /sys/module/printk/parameters/console_suspend "N"
 
-on property:vendor.post_boot.parsed=1
+on property:raph.post_boot.parsed=1
     chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
     chown system system /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq
     chown system system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
@@ -42,16 +42,18 @@ on property:vendor.post_boot.parsed=1
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "schedutil"
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/rate_limit_us 500
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/pl 0
+    write /sys/devices/system/cpu/cpufreq/policy0/schedutil/iowait_boost_enable 1
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_freq 0
     
     write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "schedutil"
     write /sys/devices/system/cpu/cpufreq/policy0/schedutil/rate_limit_us 500
     write /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl 0
+    write /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable 1
     write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
 
     # Input boost and stune configuration
-    write /sys/module/cpu_boost/parameters/input_boost_freq "0:1056000 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
-    write /sys/module/cpu_boost/parameters/input_boost_ms 600
+    write /sys/module/cpu_boost/parameters/input_boost_freq "0:1324800 1:0 2:0 3:0 4:0 5:0 6:0 7:0"
+    write /sys/module/cpu_boost/parameters/input_boost_ms 500
     write /sys/module/cpu_boost/parameters/dynamic_stune_boost 15
 
     # Enable PEWQ
@@ -69,12 +71,8 @@ on property:vendor.post_boot.parsed=1
 
     # Set default schedTune value for foreground/top-app
     write /dev/stune/foreground/schedtune.prefer_idle 1
-    write /dev/stune/top-app/schedtune.boost 1
+    write /dev/stune/top-app/schedtune.boost 5
     write /dev/stune/top-app/schedtune.prefer_idle 1
-
-    # Adjust SCHED Features
-    write /sys/kernel/debug/sched_features NO_EAS_USE_NEED_IDLE
-    write /sys/kernel/debug/sched_features TTWU_QUEUE
 
     # Setup EAS cpusets values for better load balancing
     write /dev/cpuset/top-app/cpus 0-7
@@ -102,15 +100,12 @@ on property:sys.boot_completed=1
     # Use FIFO for UI
     setprop sys.use_fifo_ui 1
 
-    # FIXME : When boot completed, in case
-    # Vendor post_boot doesn't get parsed with
-    # whatever fucking reason, just let our script
-    # continue after boot
-    setprop vendor.post_boot.parsed 1
-
     # ZRAM Wednesday my dudes
     write /sys/block/zram0/reset 1
     write /sys/block/zram0/disksize 241172480
 
     # Enable console_suspend on boot_complete to save power
     write /sys/module/printk/parameters/console_suspend "Y"
+
+on property:vendor.post_boot.parsed=1 && property:init.svc.qcom-post-boot=stopped
+    setprop raph.post_boot.parsed 1
