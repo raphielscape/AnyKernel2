@@ -63,7 +63,7 @@ on property:fku.perf.profile=0
     write /sys/module/cpu_input_boost/parameters/input_boost_freq_lp 979200
     write /sys/module/cpu_input_boost/parameters/input_boost_freq_hp 0
     write /sys/module/cpu_input_boost/parameters/input_boost_duration 32
-    write /sys/module/cpu_boost/parameters/dynamic_stune_boost 10
+    write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 10
     write /sys/class/kgsl/kgsl-3d0/devfreq/governor powersave
 
 # Balance (FK defaults)
@@ -73,7 +73,7 @@ on property:fku.perf.profile=1
     write /sys/module/cpu_input_boost/parameters/input_boost_freq_lp 1056000
     write /sys/module/cpu_input_boost/parameters/input_boost_freq_hp 902400
     write /sys/module/cpu_input_boost/parameters/input_boost_duration 100
-    write /sys/module/cpu_boost/parameters/dynamic_stune_boost 15
+    write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
     write /sys/class/kgsl/kgsl-3d0/devfreq/governor msm-adreno-tz
 
 # Performance
@@ -83,5 +83,5 @@ on property:fku.perf.profile=2
     write /sys/module/cpu_input_boost/parameters/input_boost_freq_lp 1516800
     write /sys/module/cpu_input_boost/parameters/input_boost_freq_hp 1363200
     write /sys/module/cpu_input_boost/parameters/input_boost_duration 125
-    write /sys/module/cpu_boost/parameters/dynamic_stune_boost 50
+    write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 50
     write /sys/class/kgsl/kgsl-3d0/devfreq/governor performance
