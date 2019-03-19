@@ -82,29 +82,6 @@ write /proc/sys/vm/swappiness 85
 write /sys/block/sda/queue/iostats 0
 write /sys/block/sdf/queue/iostats 0
 
-# Runtime fs tuning: as we have init boottime setting and kernel patch setting
-# default readahead to 2048KB. We should adjust the setting upon boot_complete
-# for runtime performance
-write /sys/block/sda/queue/read_ahead_kb 128
-write /sys/block/sda/queue/nr_requests 128
-write /sys/block/sda/queue/iostats 1
-write /sys/block/sda/queue/scheduler cfq
-
-write /sys/block/sde/queue/read_ahead_kb 128
-write /sys/block/sde/queue/nr_requests 128
-write /sys/block/sde/queue/iostats 1
-write /sys/block/sde/queue/scheduler cfq
-
-write /sys/block/sde/queue/read_ahead_kb 128
-write /sys/block/sde/queue/nr_requests 128
-write /sys/block/sde/queue/iostats 1
-write /sys/block/sde/queue/scheduler cfq
-
-write /sys/block/dm-0/queue/read_ahead_kb 128
-write /sys/block/dm-0/queue/nr_requests 128
-write /sys/block/dm-0/queue/iostats 1
-write /sys/block/dm-0/queue/scheduler cfq
-
 sleep 20;
 
 QSEECOMD=$(pidof qseecomd)

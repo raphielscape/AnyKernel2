@@ -51,7 +51,7 @@ on property:sys.boot_completed=1
 
     # ZRAM Wednesday my dudes
     write /sys/block/zram0/reset 1
-    write /sys/block/zram0/disksize 241172480
+    write /sys/block/zram0/disksize 1073741824
 
     # Enable console_suspend on boot_complete to save power
     write /sys/module/printk/parameters/console_suspend "Y"
