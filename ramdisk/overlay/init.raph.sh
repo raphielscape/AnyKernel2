@@ -42,6 +42,9 @@ write /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl 0
 write /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable 1
 write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
 
+# Use 15 as default stune boost
+write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
+
 # Enable PEWQ
 write /sys/module/workqueue/parameters/power_efficient Y
 
