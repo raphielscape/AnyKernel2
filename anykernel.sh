@@ -11,6 +11,7 @@ do.cleanup=1
 do.cleanuponabort=1
 device.name1=mido
 device.name2=beryllium
+supported.versions=
 '; } # end properties
 
 # shell variables
@@ -21,13 +22,14 @@ ramdisk_compression=auto;
 
 ## AnyKernel methods (DO NOT CHANGE)
 # import patching functions/variables - see for reference
-. /tmp/anykernel/tools/ak2-core.sh;
+. tools/ak3-core.sh;
 
 
 ## AnyKernel file attributes
 # set permissions/ownership for included ramdisk files
 chmod -R 750 $ramdisk/*;
 chown -R root:root $ramdisk/*;
+
 
 ## AnyKernel install
 dump_boot;
@@ -62,5 +64,5 @@ $bin/sepolicy-inject -s init -t vendor_file -c file -p mounton -P sepolicy;
 # end ramdisk changes
 
 write_boot;
-
 ## end install
+
