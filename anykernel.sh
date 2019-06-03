@@ -4,13 +4,14 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=Kat Kernel @raphielscape
+kernel.string=Kat Kernel by @raphielscape
 do.devicecheck=1
 do.modules=0
 do.cleanup=1
 do.cleanuponabort=1
 device.name1=beryllium
 device.name2=dipper
+supported.versions=
 '; } # end properties
 
 # shell variables
@@ -28,6 +29,7 @@ ramdisk_compression=auto;
 # set permissions/ownership for included ramdisk files
 chmod -R 750 $ramdisk/*;
 chown -R root:root $ramdisk/*;
+
 
 ## AnyKernel install
 dump_boot;
@@ -48,3 +50,4 @@ $bin/magiskpolicy --load sepolicy_debug --save sepolicy_debug "allow init rootfs
 # Write boot
 write_boot;
 ## end install
+
