@@ -43,7 +43,8 @@ write /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable 1
 write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
 
 # Use 15 as default stune boost
-write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
+# FIXME : dynamic stune isn't exist for now
+# write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
 
 # Enable PEWQ
 write /sys/module/workqueue/parameters/power_efficient Y
@@ -63,23 +64,18 @@ write /dev/stune/foreground/schedtune.prefer_idle 1
 write /dev/stune/top-app/schedtune.boost 5
 write /dev/stune/top-app/schedtune.prefer_idle 1
 
-# Setup EAS cpusets values for better load balancing
-write /dev/cpuset/top-app/cpus 0-7
-# Since we are not using core rotator, lets load balance
-write /dev/cpuset/foreground/cpus 0-3,6-7
+# Set CPUSet allocations
+write /dev/cpuset/audio-app/cpus 0-3
 write /dev/cpuset/background/cpus 0-1
-write /dev/cpuset/system-background/cpus 0-3
-
-# For better screen off idle
+write /dev/cpuset/camera-daemon/cpus 0-7
+write /dev/cpuset/foreground/cpus 0-3,6-7
 write /dev/cpuset/restricted/cpus 0-3
+write /dev/cpuset/system/cpus 0-1,6-7
+write /dev/cpuset/system-background/cpus 0-3
+write /dev/cpuset/top-app/cpus 0-7
 
-#Enable suspend to idle mode to reduce latency during suspend/resume
+# Enable suspend to idle mode to reduce latency during suspend/resume
 write /sys/power/mem_sleep "s2idle"
-
-# Reduce swappiness: 100 -> 85 (since December update)
-# This reduces kswapd0 CPU usage, leading to
-# better performance and battery due to less CPU time used
-write /proc/sys/vm/swappiness 85
 
 # Disable I/O statistics accounting on important block devices (others disabled in kernel)
 write /sys/block/sda/queue/iostats 0
