@@ -4,7 +4,7 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=Kat Kernel by @raphielscape
+kernel.string=Disrupt Kramel by @raphielscape
 do.devicecheck=1
 do.modules=0
 do.cleanup=1
