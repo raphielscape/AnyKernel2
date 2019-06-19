@@ -25,26 +25,10 @@ writepid_sbg() {
 
 sleep 10;
 
-write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2169600;
-
-# Set the default IRQ affinity to the silver cluster.
-write /proc/irq/default_smp_affinity f
+# write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2169600;
 
 write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "schedutil"
-write /sys/devices/system/cpu/cpufreq/policy0/schedutil/rate_limit_us 500
-write /sys/devices/system/cpu/cpufreq/policy0/schedutil/pl 0
-write /sys/devices/system/cpu/cpufreq/policy0/schedutil/iowait_boost_enable 1
-write /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_freq 0
-
 write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "schedutil"
-write /sys/devices/system/cpu/cpufreq/policy0/schedutil/rate_limit_us 500
-write /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl 0
-write /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable 1
-write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
-
-# Use 15 as default stune boost
-# FIXME : dynamic stune isn't exist for now
-# write /sys/module/cpu_input_boost/parameters/dynamic_stune_boost 15
 
 # Enable PEWQ
 write /sys/module/workqueue/parameters/power_efficient Y
@@ -58,21 +42,6 @@ write /proc/sys/kernel/sched_walt_rotate_big_tasks 0
 # Disable Boost_No_Override
 write /dev/stune/foreground/schedtune.sched_boost_no_override 0
 write /dev/stune/top-app/schedtune.sched_boost_no_override 0
-
-# Set default schedTune value for foreground/top-app
-write /dev/stune/foreground/schedtune.prefer_idle 1
-write /dev/stune/top-app/schedtune.boost 5
-write /dev/stune/top-app/schedtune.prefer_idle 1
-
-# Set CPUSet allocations
-write /dev/cpuset/audio-app/cpus 0-3
-write /dev/cpuset/background/cpus 0-1
-write /dev/cpuset/camera-daemon/cpus 0-7
-write /dev/cpuset/foreground/cpus 0-3,6-7
-write /dev/cpuset/restricted/cpus 0-3
-write /dev/cpuset/system/cpus 0-1,6-7
-write /dev/cpuset/system-background/cpus 0-3
-write /dev/cpuset/top-app/cpus 0-7
 
 # Enable suspend to idle mode to reduce latency during suspend/resume
 write /sys/power/mem_sleep "s2idle"
