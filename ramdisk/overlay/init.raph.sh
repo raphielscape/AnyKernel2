@@ -28,10 +28,17 @@ sleep 10;
 # write /sys/devices/system/cpu/cpu4/cpufreq/scaling_max_freq 2169600;
 
 write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor "schedutil"
+write /sys/devices/system/cpu/cpufreq/policy0/schedutil/up_rate_limit_us 500
+write /sys/devices/system/cpu/cpufreq/policy0/schedutil/down_rate_limit_us 20000
+write /sys/devices/system/cpu/cpufreq/policy0/schedutil/iowait_boost_enable 1
+write /sys/devices/system/cpu/cpufreq/policy0/schedutil/pl 0
+write /sys/devices/system/cpu/cpufreq/policy0/schedutil/hispeed_freq 0
 write /sys/devices/system/cpu/cpu4/cpufreq/scaling_governor "schedutil"
-
-# Enable PEWQ
-write /sys/module/workqueue/parameters/power_efficient Y
+write /sys/devices/system/cpu/cpufreq/policy4/schedutil/up_rate_limit_us 500
+write /sys/devices/system/cpu/cpufreq/policy4/schedutil/down_rate_limit_us 20000
+write /sys/devices/system/cpu/cpufreq/policy4/schedutil/iowait_boost_enable 1
+write /sys/devices/system/cpu/cpufreq/policy4/schedutil/pl 0
+write /sys/devices/system/cpu/cpufreq/policy4/schedutil/hispeed_freq 0
 
 # Disable Touchboost
 write /sys/module/msm_performance/parameters/touchboost 0
@@ -39,16 +46,28 @@ write /sys/module/msm_performance/parameters/touchboost 0
 # Disable CAF task placement for Big Cores
 write /proc/sys/kernel/sched_walt_rotate_big_tasks 0
 
-# Disable Boost_No_Override
-write /dev/stune/foreground/schedtune.sched_boost_no_override 0
-write /dev/stune/top-app/schedtune.sched_boost_no_override 0
-
 # Enable suspend to idle mode to reduce latency during suspend/resume
 write /sys/power/mem_sleep "s2idle"
 
 # Disable I/O statistics accounting on important block devices (others disabled in kernel)
 write /sys/block/sda/queue/iostats 0
 write /sys/block/sdf/queue/iostats 0
+
+# Init still likes to overriding cpuset ._.
+write /dev/cpuset/audio-app/cpus 0-7
+write /dev/cpuset/background/cpus 0-1
+write /dev/cpuset/camera-daemon/cpus 0-7
+write /dev/cpuset/foreground/cpus 0-3,6-7
+write /dev/cpuset/restricted/cpus 0-3
+write /dev/cpuset/system/cpus 0-1,6-7
+write /dev/cpuset/system-background/cpus 0-3
+write /dev/cpuset/top-app/cpus 0-7
+
+# Enable ZRAM
+write /sys/block/zram0/reset 1
+write /sys/block/zram0/disksize 1073741824
+mkswap /dev/block/zram0
+swapon /dev/block/zram0
 
 sleep 20;
 
