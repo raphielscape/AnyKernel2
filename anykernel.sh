@@ -36,11 +36,18 @@ set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 dump_boot;
 
 # Add skip_override parameter to cmdline so user doesn't have to reflash Magisk
-if [ -d $ramdisk/.backup ]; then
-    ui_print "Magisk detected! Patching cmdline so reflashing Magisk is not necessary...";
+# And notify about Magisk preservation in case of Android 10
+android_version="$(file_getprop /system/build.prop "ro.build.version.release")";
+# Do not do this for Android 10 ( A only SAR )
+if [ "$android_version" != "10" ]; then
+  if [ -d $ramdisk/.backup ]; then
+    ui_print " "; ui_print "Magisk detected! Patching cmdline so reflashing Magisk is not necessary...";
     patch_cmdline "skip_override" "skip_override";
-else
+  else
     patch_cmdline "skip_override" "";
+  fi;
+else
+  ui_print " "; ui_print "You are on android 10! Not performing Magisk preservation. Please reflash Magisk if you want to keep it.";
 fi;
 
 # Set magisk policy
