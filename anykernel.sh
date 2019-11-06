@@ -11,6 +11,7 @@ do.cleanup=1
 do.cleanuponabort=1
 device.name1=beryllium
 device.name2=dipper
+device.name3=polaris
 supported.versions=
 supported.patchlevels=
 '; } # end properties
