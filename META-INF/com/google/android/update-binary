@@ -27,7 +27,7 @@ ui_printfile() {
 show_progress() { echo "progress $1 $2" > $OUTFD; }
 file_getprop() { $bb grep "^$2=" "$1" | $bb cut -d= -f2-; }
 int2ver() {
-  if [ "$1" -eq "$1" ] 2>/dev/null; then 
+  if [ "$1" -eq "$1" ] 2>/dev/null; then
     echo "$1.0.0";
   elif [ ! "$(echo "$1" | $bb cut -d. -f3)" ]; then
     echo "$1.0";
@@ -57,7 +57,8 @@ setup_mountpoint() {
 }
 is_mounted() { $bb mount | $bb grep -q " $1 "; }
 umount_all() {
-  ($bb umount /system;
+  ($BOOTMODE || umount_apex;
+  $bb umount /system;
   $bb umount -l /system;
   if [ -e /system_root ]; then
     $bb umount /system_root;
@@ -69,6 +70,51 @@ umount_all() {
     $bb umount /data;
     $bb umount -l /data;
   fi) 2>/dev/null;
+}
+mount_apex() {
+  [ -d /system/apex ] || return 1
+  [ -L /apex ] && rm -f /apex
+  if [ -f "/system/apex/com.android.runtime.release.apex" ]; then
+    local j=0
+    [ -e /dev/block/loop1 ] && local minorx=$(ls -l /dev/block/loop1 | $bb awk '{print $6}') || local minorx=1
+    for i in /system/apex/*.apex; do
+      local dest="/apex/$(basename $i | sed 's/.apex$//')"
+      [ "$dest" == "/apex/com.android.runtime.release" ] && dest="/apex/com.android.runtime"
+      mkdir -p $dest
+      $bb unzip -qo $i apex_payload.img -d /apex
+      mv -f /apex/apex_payload.img $dest.img
+      while [ $j -lt 50 ]; do
+        loop=/dev/loop$j
+        $bb mknod $loop b 7 $((j * minorx)) 2>/dev/null
+        $bb losetup $loop $dest.img 2>/dev/null
+        j=$((j + 1))
+        $bb losetup $loop | grep -q $dest.img && break
+      done;
+      uloop="$uloop $((j - 1))"
+      $bb mount -t ext4 -o loop,noatime,ro $loop $dest || return 1
+    done
+  # Already extracted payload imgs present, just mount the folders
+  elif [ -d "/system/apex/com.android.runtime.release" ]; then
+    for i in /system/apex/*; do
+      local dest="/apex/$(basename $i)"
+      [ "$dest" == "/apex/com.android.runtime.release" ] && dest="/apex/com.android.runtime"
+      mkdir -p $dest
+      $bb mount -o bind,ro $i $dest
+    done
+  fi
+}
+umount_apex() {
+  [ -d /apex ] || return 1
+  for i in /apex/*; do
+    $bb umount -l $i 2>/dev/null
+  done
+  if [ -f "/system/apex/com.android.runtime.release.apex" ]; then
+    for i in $uloop; do
+      local loop=/dev/loop$i
+      losetup -d $loop 2>/dev/null || break
+    done
+  fi
+  rm -rf /apex
 }
 restore_env() {
   test "$savedpath" && export LD_LIBRARY_PATH="$savedpath";
@@ -153,6 +199,7 @@ if is_mounted /system_root; then
   $bb mount -o bind /system_root/system /system;
 fi;
 $bb mount -o ro -t auto /vendor 2>/dev/null;
+$BOOTMODE || mount_apex;
 if ! is_mounted /data; then
   $bb mount /data;
   umount_data=1;
@@ -165,11 +212,15 @@ unset LD_PRELOAD;
 
 if [ ! "$(getprop 2>/dev/null)" ]; then
   getprop() {
-    local propval="$(file_getprop /default.prop $1 2>/dev/null)";
-    test "$propval" || local propval="$(file_getprop /system/build.prop $1 2>/dev/null)";
+    local propdir propfile propval;
+    for propdir in / /system_root /system /vendor /odm /product; do
+      for propfile in default.prop build.prop; do
+        test "$propval" && break 2 || propval="$(file_getprop $propdir/$propfile $1 2>/dev/null)";
+      done;
+    done;
     test "$propval" && echo "$propval" || echo "";
   }
-elif [ ! "$(getprop ro.product.device 2>/dev/null)" -a ! "$(getprop ro.build.product 2>/dev/null)" ]; then
+elif [ ! "$(getprop ro.build.type 2>/dev/null)" ]; then
   getprop() {
     ($(which getprop) | $bb grep "$1" | $bb cut -d[ -f3 | $bb cut -d] -f1) 2>/dev/null;
   }
@@ -177,14 +228,18 @@ fi;
 
 if [ "$(file_getprop anykernel.sh do.devicecheck)" == 1 ]; then
   ui_print "Checking device...";
-  device=$(getprop ro.product.device);
-  product=$(getprop ro.build.product);
+  device=$(getprop ro.product.device 2>/dev/null);
+  product=$(getprop ro.build.product 2>/dev/null);
+  vendordevice=$(getprop ro.product.vendor.device 2>/dev/null);
+  vendorproduct=$(getprop ro.vendor.product.device 2>/dev/null);
   for testname in $(file_getprop anykernel.sh 'device.name.*'); do
-    if [ "$device" == "$testname" -o "$product" == "$testname" ]; then
-      ui_print "$testname" " ";
-      match=1;
-      break;
-    fi;
+    for devicename in $device $product $vendordevice $vendorproduct; do
+      if [ "$devicename" == "$testname" ]; then
+        ui_print "$testname" " ";
+        match=1;
+        break 2;
+      fi;
+    done;
   done;
   if [ ! "$match" ]; then
     abort " " "Unsupported device. Aborting...";
