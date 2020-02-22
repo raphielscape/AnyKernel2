@@ -37,26 +37,6 @@ set_perm_recursive 0 0 750 750 $ramdisk/init* $ramdisk/sbin;
 ## AnyKernel install
 dump_boot;
 
-# Add skip_override parameter to cmdline so user doesn't have to reflash Magisk
-# And notify about Magisk preservation in case of Android 10
-android_version="$(file_getprop /system/build.prop "ro.build.version.release")";
-# Do not do this for Android 10 ( A only SAR )
-if [ "$android_version" != "10" ]; then
-  if [ -d $ramdisk/.backup ]; then
-    ui_print " "; ui_print "Magisk detected! Patching cmdline so reflashing Magisk is not necessary...";
-    patch_cmdline "skip_override" "skip_override";
-  else
-    patch_cmdline "skip_override" "";
-  fi;
-else
-  ui_print " "; ui_print "You are on android 10! Not performing Magisk preservation. Please reflash Magisk if you want to keep it.";
-fi;
-
-# Set magisk policy
-ui_print "Setting up magisk policy for SELinux...";
-$bin/magiskpolicy --load sepolicy --save sepolicy "allow init rootfs file execute_no_trans";
-$bin/magiskpolicy --load sepolicy_debug --save sepolicy_debug "allow init rootfs file execute_no_trans";
-
 # Write boot
 write_boot;
 ## end install
